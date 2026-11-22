@@ -1,0 +1,44 @@
+{
+  "checks": [
+    {
+      "key": "focus-tier2-search", "family": "x-tier", "argv": ["-"], "stdin": "t.txt\n<<<<<<< SEARCH\nalpha\nbeta\n=======\nnewalpha\nbeta\n>>>>>>> REPLACE\n",
+      "files": {"t.txt": "    alpha\n    beta\n"},
+      "expect": {"exit": 0, "stdout": "M t.txt\nok: 1 file\n", "changes": {"t.txt": "    newalpha\n    beta\n"}}
+    },
+    {
+      "key": "focus-tier1-unified", "family": "x-tier", "argv": ["-"], "stdin": "--- u.txt\n+++ u.txt\n@@ -1,2 +1,2 @@\n foo\n-bar\n+baz\n",
+      "files": {"u.txt": "foo  \nbar\n"},
+      "expect": {"exit": 0, "stdout": "M u.txt\nok: 1 file\n", "changes": {"u.txt": "foo  \nbaz\n"}}
+    },
+    {
+      "key": "focus-nearest-unified", "family": "x-unified", "argv": ["-"], "stdin": "--- n.txt\n+++ n.txt\n@@ -3,2 +3,2 @@\n x\n-z\n+w\n",
+      "files": {"n.txt": "x\ny\nx\nz\n"},
+      "expect": {"exit": 0, "stdout": "M n.txt\nok: 1 file\n", "changes": {"n.txt": "x\ny\nx\nw\n"}}
+    },
+    {
+      "key": "focus-ambiguous-search", "family": "x-search", "argv": ["-"], "stdin": "a.txt\n<<<<<<< SEARCH\ndup\n=======\nother\n>>>>>>> REPLACE\n",
+      "files": {"a.txt": "dup\ndup\n"},
+      "expect": {"exit": 1, "stdout": "error: ambiguous a.txt\nfailed: 1 of 1 edits\n", "changes": {}}
+    },
+    {
+      "key": "focus-anchor-move-v4a", "family": "x-v4a", "argv": ["-"], "stdin": "*** Begin Patch\n*** Update File: m.txt\n*** Move to: moved.txt\n@@ target\n-line\n+LINE\n*** End Patch\n",
+      "files": {"m.txt": "head\ntarget\nline\n"},
+      "expect": {"exit": 0, "stdout": "R m.txt -> moved.txt\nok: 1 file\n", "changes": {"m.txt": null, "moved.txt": "head\ntarget\nLINE\n"}}
+    },
+    {
+      "key": "focus-add-v4a", "family": "x-v4a", "argv": ["-"], "stdin": "*** Begin Patch\n*** Add File: x.txt\n+one\n+\n+two\n*** End Patch\n",
+      "files": {},
+      "expect": {"exit": 0, "stdout": "A x.txt\nok: 1 file\n", "changes": {"x.txt": "one\n\ntwo\n"}}
+    },
+    {
+      "key": "focus-noeol-unified", "family": "x-newline", "argv": ["-"], "stdin": "--- e.txt\n+++ e.txt\n@@ -1,2 +1,2 @@\n a\n-b\n+c\n\\ No newline at end of file\n",
+      "files": {"e.txt": "a\nb\n"},
+      "expect": {"exit": 0, "stdout": "M e.txt\nok: 1 file\n", "changes": {"e.txt": "a\nc"}}
+    },
+    {
+      "key": "focus-create-unified", "family": "x-newline", "argv": ["-"], "stdin": "--- /dev/null\n+++ b/created.txt\n@@ -0,0 +1,2 @@\n+one\n+two\n",
+      "files": {},
+      "expect": {"exit": 0, "stdout": "A created.txt\nok: 1 file\n", "changes": {"created.txt": "one\ntwo\n"}}
+    }
+  ]
+}
