@@ -1,0 +1,29 @@
+{
+  "checks": [
+    {
+      "key": "repair-add-one-newline", "family": "x-repair", "argv": ["-"], "stdin": "*** Begin Patch\n*** Add File: x.txt\n+\n*** End Patch\n",
+      "files": {},
+      "expect": {"exit": 0, "stdout": "A x.txt\nok: 1 file\n", "changes": {"x.txt": "\n"}}
+    },
+    {
+      "key": "repair-add-trailing-plus", "family": "x-repair", "argv": ["-"], "stdin": "*** Begin Patch\n*** Add File: y.txt\n+a\n+\n+\n*** End Patch\n",
+      "files": {},
+      "expect": {"exit": 0, "stdout": "A y.txt\nok: 1 file\n", "changes": {"y.txt": "a\n\n\n"}}
+    },
+    {
+      "key": "repair-add-trim-raw-blank", "family": "x-repair", "argv": ["-"], "stdin": "*** Begin Patch\n*** Add File: z.txt\n+a\n\n\n*** End Patch\n",
+      "files": {},
+      "expect": {"exit": 0, "stdout": "A z.txt\nok: 1 file\n", "changes": {"z.txt": "a\n"}}
+    },
+    {
+      "key": "repair-unified-move-nomatch", "family": "x-repair", "argv": ["-"], "stdin": "--- old.txt\n+++ new.txt\n@@ -1 +1 @@\n-nomatch\n+repl\n",
+      "files": {"old.txt": "actual\n"},
+      "expect": {"exit": 1, "stdout": "error: no-match old.txt\nfailed: 1 of 1 edits\n", "changes": {}}
+    },
+    {
+      "key": "repair-v4a-move-nomatch", "family": "x-repair", "argv": ["-"], "stdin": "*** Begin Patch\n*** Update File: src.txt\n*** Move to: dst.txt\n@@ anchor\n-line\n*** End Patch\n",
+      "files": {"src.txt": "anchor\nactual\n"},
+      "expect": {"exit": 1, "stdout": "error: no-match src.txt\nfailed: 1 of 1 edits\n", "changes": {}}
+    }
+  ]
+}

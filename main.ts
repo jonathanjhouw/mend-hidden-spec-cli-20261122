@@ -438,7 +438,7 @@ function unifiedEdits(lines: string[], strict: boolean): Edit[] {
         if (before === null) throw new Fail('missing', from);
         if (tree.get(to) !== null) throw new Fail('exists', to);
         tree.now.set(from, null);
-        tree.now.set(to, applyHunks(before, s.hunks, strict, to));
+        tree.now.set(to, applyHunks(before, s.hunks, strict, from));
         tree.moves.push([from, to]);
       });
     } else {
@@ -599,17 +599,17 @@ function v4aEdits(lines: string[], strict: boolean): Edit[] {
     if (l.startsWith('*** Add File: ')) {
       const at = i + 1;
       const path = l.slice(14).trim();
-      const content: string[] = [];
+      const content: { text: string; raw: boolean }[] = [];
       i += 1;
       while (i < last && !isSection(lines[i]!)) {
         const b = lines[i]!;
-        if (blank(b)) content.push('');
-        else if (b.startsWith('+')) content.push(b.slice(1));
+        if (blank(b)) content.push({ text: '', raw: true });
+        else if (b.startsWith('+')) content.push({ text: b.slice(1), raw: false });
         else throw new Exit2(`error: parse ${i + 1}`);
         i += 1;
       }
-      while (content.length > 0 && content[content.length - 1] === '') content.pop();
-      sections.push({ kind: 'add', path, lines: content, at });
+      while (content.length > 0 && content[content.length - 1]!.raw) content.pop();
+      sections.push({ kind: 'add', path, lines: content.map((c) => c.text), at });
       continue;
     }
     if (l.startsWith('*** Delete File: ')) {
@@ -688,7 +688,7 @@ function v4aEdits(lines: string[], strict: boolean): Edit[] {
         const before = tree.get(s.path);
         if (before === null) throw new Fail('missing', s.path);
         if (move !== null && tree.get(move) !== null) throw new Fail('exists', move);
-        const after = applyChunks(before, chunks, strict, move ?? s.path);
+        const after = applyChunks(before, chunks, strict, s.path);
         if (move !== null) {
           tree.now.set(s.path, null);
           tree.now.set(move, after);
